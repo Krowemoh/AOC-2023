@@ -1,0 +1,26 @@
+*
+   GIT.FILENAME = 'GET.PUZZLE.INPUT'
+   GIT.REPO = 'https://github.com/Krowemoh/AOC-2023.git'
+*
+   OPEN '','AOC-PUZZLE-FILE' TO AOC.PUZZLE.FILE ELSE
+      PRINT 'Unable to open file: AOC-PUZZLE-FILE - Press RETURN':
+      INPUT ANYTHING
+      STOP
+   END
+*
+   SESSION.ID = ''
+   YEAR = 2023
+   DAY = 1
+*
+   COMMAND = 'curl -s --cookie "session=':SESSION.ID:'" https://adventofcode.com/':YEAR:'/day/':DAY:'/input'
+*
+   EXECUTE \SH -c '\ : COMMAND : \'\ CAPTURING RESULTS
+*
+   PUZZLE.ID = YEAR:'*':DAY
+*
+   WRITE RESULTS ON AOC.PUZZLE.FILE,PUZZLE.ID
+*
+* END OF PROGRAM
+*
+   END
+*
