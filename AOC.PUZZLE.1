@@ -1,0 +1,94 @@
+*
+   GIT.FILENAME = 'AOC.PUZZLE.1'
+   GIT.REPO = 'https://github.com/Krowemoh/AOC-2023.git'
+*
+   OPEN '','AOC-PUZZLE-FILE' TO AOC.PUZZLE.FILE ELSE
+      PRINT 'Unable to open file: AOC-PUZZLE-FILE - Press RETURN':
+      INPUT ANYTHING
+      STOP
+   END
+*
+   READ RAW.DATA FROM AOC.PUZZLE.FILE,'2023*1' ELSE
+      PRINT 'No Puzzle Input.'
+      STOP
+   END
+*
+   NUMBER.OF.LINES = DCOUNT(RAW.DATA,@AM)
+*
+   PUZZLE = OCONVS(RAW.DATA,'MCN')
+*
+   VALUES = ''
+   FOR I = 1 TO NUMBER.OF.LINES
+      LINE = PUZZLE<I>
+      C = LINE[1,1] : LINE[1]
+      VALUES<-1> = C
+   NEXT I
+*
+   PRINT 'Answer 1: ' : SUM(VALUES)
+*
+*TEMP    RAW.DATA = ''
+*TEMP    RAW.DATA<-1> = 'two1nine'
+*TEMP    RAW.DATA<-1> = 'eightwothree'
+*TEMP    RAW.DATA<-1> = 'abcone2threexyz'
+*TEMP    RAW.DATA<-1> = 'xtwone3four'
+*TEMP    RAW.DATA<-1> = '4nineeightseven2'
+*TEMP    RAW.DATA<-1> = 'zoneight234'
+*TEMP    RAW.DATA<-1> = '7pqrstsixteen'
+*TEMP    NUMBER.OF.LINES = DCOUNT(RAW.DATA,@AM)
+*
+   PUZZLE = RAW.DATA
+*
+   VALUES = ''
+   FOR I = 1 TO NUMBER.OF.LINES
+      LINE = TRIM(PUZZLE<I>)
+      NEW.LINE = ''
+*
+      FOR K = 1 TO LEN(LINE)
+         CHR = LINE[K,1]
+*
+         IF NUM(CHR) THEN
+            NEW.LINE := CHR
+            CONTINUE
+         END
+*
+         BEGIN CASE
+            CASE LINE[K,3] = 'one'
+               NEW.LINE := 1
+*
+            CASE LINE[K,3] = 'two'
+               NEW.LINE := 2
+*
+            CASE LINE[K,5] = 'three'
+               NEW.LINE := 3
+*
+            CASE LINE[K,4] = 'four'
+               NEW.LINE := 4
+*
+            CASE LINE[K,4] = 'five'
+               NEW.LINE := 5
+*
+            CASE LINE[K,3] = 'six'
+               NEW.LINE := 6
+*
+            CASE LINE[K,5] = 'seven'
+               NEW.LINE := 7
+*
+            CASE LINE[K,5] = 'eight'
+               NEW.LINE := 8
+*
+            CASE LINE[K,4] = 'nine'
+               NEW.LINE := 9
+         END CASE
+      NEXT K
+*
+      C = NEW.LINE[1,1] : NEW.LINE[1]
+      PRINT LINE, NEW.LINE, C
+      VALUES<-1> = C
+   NEXT I
+*
+   PRINT 'Answer 2: ' : SUM(VALUES)
+*
+* END OF PROGRAM
+*
+   END
+*
