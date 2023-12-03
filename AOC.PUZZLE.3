@@ -1,0 +1,346 @@
+*
+   GIT.FILENAME = 'AOC.PUZZLE.3'
+   GIT.REPO = 'https://github.com/Krowemoh/AOC-2023.git'
+*
+   EQU TRUE TO 1
+   EQU FALSE TO 0
+*
+   OPEN '','AOC-PUZZLE-FILE' TO AOC.PUZZLE.FILE ELSE
+      PRINT 'Unable to open file: AOC-PUZZLE-FILE - Press RETURN':
+      INPUT ANYTHING
+      STOP
+   END
+*
+   READ RAW.DATA FROM AOC.PUZZLE.FILE,'2023*3' ELSE
+      PRINT 'No Puzzle Input.'
+      STOP
+   END
+*
+   GOSUB TEST.DATA
+*
+   GOSUB 100
+*
+   GOSUB 200
+*
+   STOP
+*
+*********************  S U B R O U T I N E  *********************
+*
+TEST.DATA:NULL
+*
+   RAW.DATA = ''
+*
+   RAW.DATA<-1> = '467..114..'
+   RAW.DATA<-1> = '...*......'
+   RAW.DATA<-1> = '..35..633.'
+   RAW.DATA<-1> = '......#...'
+   RAW.DATA<-1> = '617*......'
+   RAW.DATA<-1> = '.....+.58.'
+   RAW.DATA<-1> = '..592.....'
+   RAW.DATA<-1> = '......755.'
+   RAW.DATA<-1> = '...$.*....'
+   RAW.DATA<-1> = '.664.598..'
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+100:NULL
+*
+   NUMBER.OF.LINES = DCOUNT(RAW.DATA,@AM)
+*
+   SUM = ''
+*
+   FOR I = 1 TO NUMBER.OF.LINES
+      LINE = RAW.DATA<I>
+      MAX = LEN(LINE)
+*
+      FOR J = 1 TO MAX
+         C = LINE[J,1]
+*
+         IF C = '.' THEN CONTINUE
+         IF NUM(C) THEN CONTINUE
+*
+         LEFT = '!'
+         RIGHT = '!'
+*
+         TOP = '!'
+         TOP.LEFT = '!'
+         TOP.RIGHT = '!'
+*
+         BOTTOM = '!'
+         BOTTOM.LEFT = '!'
+         BOTTOM.RIGHT = '!'
+*
+         IF J > 1 THEN LEFT = RAW.DATA<I>[J-1,1]
+         IF J+1 =< MAX THEN RIGHT = RAW.DATA<I>[J+1,1]
+*
+         IF I > 1 THEN
+            TOP = RAW.DATA<I-1>[J,1]
+            IF J > 1 THEN TOP.LEFT = RAW.DATA<I-1>[J-1,1]
+            IF J+1 =< MAX THEN TOP.RIGHT = RAW.DATA<I-1>[J+1,1]
+         END
+*
+         IF I + 1 =< NUMBER.OF.LINES THEN
+            BOTTOM = RAW.DATA<I+1>[J,1]
+            IF J > 1 THEN BOTTOM.LEFT = RAW.DATA<I+1>[J-1,1]
+            IF J+1 =< MAX THEN BOTTOM.RIGHT = RAW.DATA<I+1>[J+1,1]
+         END
+*
+         IF NUM(TOP) THEN
+            N = TOP
+*
+            N.CTR = J
+            LINE.POS = I-1
+            GOSUB EAT.LEFT
+*
+            N.CTR = J
+            LINE.POS = I-1
+            GOSUB EAT.RIGHT
+*
+            SUM = SUM + N
+*
+         END ELSE
+            IF NUM(TOP.LEFT) THEN
+               N = TOP.LEFT
+               N.CTR = J-1
+               LINE.POS = I-1
+               GOSUB EAT.LEFT
+               SUM = SUM + N
+*
+            END
+*
+            IF NUM(TOP.RIGHT) THEN
+               N = TOP.RIGHT
+               N.CTR = J+1
+               LINE.POS = I-1
+               GOSUB EAT.RIGHT
+               SUM = SUM + N
+            END
+         END
+*
+         IF NUM(BOTTOM) THEN
+            N = BOTTOM
+*
+            N.CTR = J
+            LINE.POS = I+1
+            GOSUB EAT.LEFT
+*
+            N.CTR = J
+            LINE.POS = I+1
+            GOSUB EAT.RIGHT
+            SUM = SUM + N
+*
+         END ELSE
+            IF NUM(BOTTOM.LEFT) THEN
+               N = BOTTOM.LEFT
+               N.CTR = J-1
+               LINE.POS = I+1
+               GOSUB EAT.LEFT
+               SUM = SUM + N
+*
+            END
+*
+            IF NUM(BOTTOM.RIGHT) THEN
+               N = BOTTOM.RIGHT
+               N.CTR = J+1
+               LINE.POS = I+1
+               GOSUB EAT.RIGHT
+               SUM = SUM + N
+            END
+         END
+*
+         IF NUM(LEFT) THEN
+            N = LEFT
+            N.CTR = J-1
+            LINE.POS = I
+            GOSUB EAT.LEFT
+            SUM = SUM + N
+         END
+*
+         IF NUM(RIGHT) THEN
+            N = RIGHT
+            N.CTR = J+1
+            LINE.POS = I
+            GOSUB EAT.RIGHT
+            SUM = SUM + N
+         END
+      NEXT C
+*
+   NEXT I
+*
+   PRINT 'Part 1 ANS: ' : SUM
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+200:NULL
+*
+   NUMBER.OF.LINES = DCOUNT(RAW.DATA,@AM)
+*
+   SUM = ''
+*
+   FOR I = 1 TO NUMBER.OF.LINES
+      LINE = RAW.DATA<I>
+      MAX = LEN(LINE)
+*
+*
+      FOR J = 1 TO MAX
+         C = LINE[J,1]
+*
+         IF C # '*' THEN CONTINUE
+*
+         PARTS = ''
+*
+         LEFT = '!'
+         RIGHT = '!'
+*
+         TOP = '!'
+         TOP.LEFT = '!'
+         TOP.RIGHT = '!'
+*
+         BOTTOM = '!'
+         BOTTOM.LEFT = '!'
+         BOTTOM.RIGHT = '!'
+*
+         IF J > 1 THEN LEFT = RAW.DATA<I>[J-1,1]
+         IF J+1 =< MAX THEN RIGHT = RAW.DATA<I>[J+1,1]
+*
+         IF I > 1 THEN
+            TOP = RAW.DATA<I-1>[J,1]
+            IF J > 1 THEN TOP.LEFT = RAW.DATA<I-1>[J-1,1]
+            IF J+1 =< MAX THEN TOP.RIGHT = RAW.DATA<I-1>[J+1,1]
+         END
+*
+         IF I + 1 =< NUMBER.OF.LINES THEN
+            BOTTOM = RAW.DATA<I+1>[J,1]
+            IF J > 1 THEN BOTTOM.LEFT = RAW.DATA<I+1>[J-1,1]
+            IF J+1 =< MAX THEN BOTTOM.RIGHT = RAW.DATA<I+1>[J+1,1]
+         END
+*
+*
+         IF NUM(TOP) THEN
+            N = TOP
+*
+            N.CTR = J
+            LINE.POS = I-1
+            GOSUB EAT.LEFT
+*
+            N.CTR = J
+            LINE.POS = I-1
+            GOSUB EAT.RIGHT
+*
+            PARTS<-1> = N
+*
+         END ELSE
+            IF NUM(TOP.LEFT) THEN
+               N = TOP.LEFT
+               N.CTR = J-1
+               LINE.POS = I-1
+               GOSUB EAT.LEFT
+               PARTS<-1> = N
+*
+            END
+*
+            IF NUM(TOP.RIGHT) THEN
+               N = TOP.RIGHT
+               N.CTR = J+1
+               LINE.POS = I-1
+               GOSUB EAT.RIGHT
+               PARTS<-1> = N
+            END
+         END
+*
+         IF NUM(BOTTOM) THEN
+            N = BOTTOM
+*
+            N.CTR = J
+            LINE.POS = I+1
+            GOSUB EAT.LEFT
+*
+            N.CTR = J
+            LINE.POS = I+1
+            GOSUB EAT.RIGHT
+            PARTS<-1> = N
+*
+         END ELSE
+            IF NUM(BOTTOM.LEFT) THEN
+               N = BOTTOM.LEFT
+               N.CTR = J-1
+               LINE.POS = I+1
+               GOSUB EAT.LEFT
+               PARTS<-1> = N
+*
+            END
+*
+            IF NUM(BOTTOM.RIGHT) THEN
+               N = BOTTOM.RIGHT
+               N.CTR = J+1
+               LINE.POS = I+1
+               GOSUB EAT.RIGHT
+               PARTS<-1> = N
+            END
+         END
+*
+         IF NUM(LEFT) THEN
+            N = LEFT
+            N.CTR = J-1
+            LINE.POS = I
+            GOSUB EAT.LEFT
+            PARTS<-1> = N
+         END
+*
+         IF NUM(RIGHT) THEN
+            N = RIGHT
+            N.CTR = J+1
+            LINE.POS = I
+            GOSUB EAT.RIGHT
+            PARTS<-1> = N
+         END
+*
+         IF DCOUNT(PARTS,@AM) > 1 THEN
+            T = 1
+            FOR P.CTR = 1 TO DCOUNT(PARTS,@AM)
+               T = SMUL(T,PARTS<P.CTR>)
+            NEXT P.CTR
+            SUM = SADD(SUM,T)
+         END
+      NEXT C
+*
+   NEXT I
+*
+   PRINT 'Part 2 ANS: ' : SUM
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+EAT.LEFT:NULL
+*
+   LOOP
+      N.CTR = N.CTR - 1
+      NEXT.CHAR = RAW.DATA<LINE.POS>[N.CTR,1]
+   UNTIL NEXT.CHAR = '.' OR NOT(NUM(NEXT.CHAR)) OR N.CTR < 1 DO
+      N = NEXT.CHAR : N
+   REPEAT
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+EAT.RIGHT:NULL
+*
+   LOOP
+      N.CTR = N.CTR + 1
+      NEXT.CHAR = RAW.DATA<LINE.POS>[N.CTR,1]
+   UNTIL NEXT.CHAR = '.' OR NOT(NUM(NEXT.CHAR)) OR N.CTR > MAX DO
+      N = N : NEXT.CHAR
+   REPEAT
+*
+   RETURN
+*
+* END OF PROGRAM
+*
+   END
+*
