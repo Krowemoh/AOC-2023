@@ -1,0 +1,150 @@
+*
+   GIT.FILENAME = 'AOC.PUZZLE.2'
+   GIT.REPO = 'https://github.com/Krowemoh/AOC-2023.git'
+*
+   EQU TRUE TO 1
+   EQU FALSE TO 0
+*
+   OPEN '','AOC-PUZZLE-FILE' TO AOC.PUZZLE.FILE ELSE
+      PRINT 'Unable to open file: AOC-PUZZLE-FILE - Press RETURN':
+      INPUT ANYTHING
+      STOP
+   END
+*
+   READ RAW.DATA FROM AOC.PUZZLE.FILE,'2023*2' ELSE
+      PRINT 'No Puzzle Input.'
+      STOP
+   END
+*
+*
+*TEMP    GOSUB TEST.DATA
+*
+   GOSUB 100
+   GOSUB 200
+*
+   STOP
+*
+*********************  S U B R O U T I N E  *********************
+*
+TEST.DATA:NULL
+*
+   RAW.DATA = ''
+*
+   RAW.DATA<-1> = 'Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green'
+   RAW.DATA<-1> = 'Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue'
+   RAW.DATA<-1> = 'Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red'
+   RAW.DATA<-1> = 'Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red'
+   RAW.DATA<-1> = 'Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green'
+*
+   RETURN
+*********************  S U B R O U T I N E  *********************
+*
+100 :NULL
+*
+   BAG = ''
+   BAG<1> = 'red' : @VM : 'green' : @VM : 'blue'
+   BAG<2> = '12' : @VM : '13' : @VM : '14'
+*
+   NUMBER.OF.GAMES = DCOUNT(RAW.DATA,@AM)
+*
+   ANS = ''
+*
+   FOR I = 1 TO NUMBER.OF.GAMES
+      GAME = RAW.DATA<I>
+*
+      GAME.ID = FIELD(FIELD(GAME,':',1),' ',2)
+      GAME = TRIM(FIELD(GAME,':',2))
+*
+      GAME = CHANGE(GAME,', ',@AM)
+      GAME = CHANGE(GAME,'; ',@AM)
+      GAME = CHANGE(GAME,' ',@VM)
+*
+      NUMBER.OF.SETS = DCOUNT(GAME,@AM)
+*
+      VALID.GAME = TRUE
+*
+      FOR J = 1 TO NUMBER.OF.SETS
+         GAME.SET = GAME<J>
+*
+         NUMBER = GAME<J,1>
+         COLOR = GAME<J,2>
+*
+         LOCATE(COLOR,BAG,1;BAG.POS) ELSE STOP 202,'Invalid Color: ' : COLOR
+*
+         IF NUMBER > BAG<2,BAG.POS> THEN
+            VALID.GAME = FALSE
+            EXIT
+         END
+      NEXT J
+*
+      IF VALID.GAME THEN
+         ANS = ANS + GAME.ID
+      END
+   NEXT I
+*
+   PRINT 'Part 1 ANS: ' : ANS
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+200:NULL
+*
+   NUMBER.OF.GAMES = DCOUNT(RAW.DATA,@AM)
+*
+   ANS = ''
+*
+   REDS = ''
+   BLUES = ''
+   GREENS = ''
+*
+   FOR I = 1 TO NUMBER.OF.GAMES
+      GAME = RAW.DATA<I>
+*
+      GAME.ID = FIELD(FIELD(GAME,':',1),' ',2)
+      GAME = TRIM(FIELD(GAME,':',2))
+*
+      GAME = CHANGE(GAME,', ',@AM)
+      GAME = CHANGE(GAME,'; ',@AM)
+      GAME = CHANGE(GAME,' ',@VM)
+*
+      NUMBER.OF.SETS = DCOUNT(GAME,@AM)
+*
+      VALID.GAME = TRUE
+*
+      FOR J = 1 TO NUMBER.OF.SETS
+         GAME.SET = GAME<J>
+*
+         NUMBER = GAME<J,1>
+         COLOR = GAME<J,2>
+*
+         LOCATE(COLOR,BAG,1;BAG.POS) ELSE STOP 202,'Invalid Color: ' : COLOR
+*
+         BEGIN CASE
+            CASE COLOR = 'red'
+               REDS<I,-1> = NUMBER
+               REDS<I> = MAXIMUM(REDS<I>)
+*
+            CASE COLOR = 'blue'
+               BLUES<I,-1> = NUMBER
+               BLUES<I> = MAXIMUM(BLUES<I>)
+*
+            CASE COLOR = 'green'
+               GREENS<I,-1> = NUMBER
+               GREENS<I> = MAXIMUM(GREENS<I>)
+         END CASE
+      NEXT J
+   NEXT I
+*
+   MUL = MULS(REDS,BLUES)
+   MUL = MULS(MUL,GREENS)
+   ANS = SUM(MUL)
+*
+   PRINT 'Part 2 ANS: ' : ANS
+*
+   RETURN
+*
+* END OF PROGRAM
+*
+   END
+*
