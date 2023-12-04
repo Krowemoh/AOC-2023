@@ -1,0 +1,125 @@
+*
+   GIT.FILENAME = 'AOC.PUZZLE.4'
+   GIT.REPO = 'https://github.com/Krowemoh/AOC-2023.git'
+*
+   EQU TRUE TO 1
+   EQU FALSE TO 0
+*
+   OPEN '','AOC-PUZZLE-FILE' TO AOC.PUZZLE.FILE ELSE
+      PRINT 'Unable to open file: AOC-PUZZLE-FILE - Press RETURN':
+      INPUT ANYTHING
+      STOP
+   END
+*
+   READ RAW.DATA FROM AOC.PUZZLE.FILE,'2023*4' ELSE
+      PRINT 'No Puzzle Input.'
+      STOP
+   END
+*
+*TEMP    GOSUB TEST.DATA
+*
+   GOSUB 100
+*
+   GOSUB 200
+*
+   STOP
+*
+*********************  S U B R O U T I N E  *********************
+*
+TEST.DATA:NULL
+*
+   RAW.DATA = ''
+*
+   RAW.DATA<-1> = 'Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53'
+   RAW.DATA<-1> = 'Card 2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19'
+   RAW.DATA<-1> = 'Card 3:  1 21 53 59 44 | 69 82 63 72 16 21 14  1'
+   RAW.DATA<-1> = 'Card 4: 41 92 73 84 69 | 59 84 76 51 58  5 54 83'
+   RAW.DATA<-1> = 'Card 5: 87 83 26 28 32 | 88 30 70 12 93 22 82 36'
+   RAW.DATA<-1> = 'Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11'
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+100:NULL
+*
+   NUMBER.OF.LINES = DCOUNT(RAW.DATA,@AM)
+*
+   SUM = 0
+*
+   FOR I = 1 TO NUMBER.OF.LINES
+      LINE = RAW.DATA<I>
+*
+      NUMBERS = TRIM(FIELD(FIELD(LINE,'|',1),':',2))
+      CONVERT ' ' TO @AM IN NUMBERS
+*
+      GUESSES = TRIM(FIELD(LINE,'|',2))
+      CONVERT ' ' TO @AM IN GUESSES
+*
+      NUMBER.OF.GUESSES = DCOUNT(GUESSES,@AM)
+*
+      WINS = 0
+*
+      FOR J = 1 TO NUMBER.OF.GUESSES
+         GUESS = GUESSES<J>
+         LOCATE(GUESS,NUMBERS;ANYPOS) THEN
+            WINS = WINS + 1
+         END
+      NEXT J
+*
+      IF WINS # 0 THEN
+         SUM = SUM + PWR(2,WINS-1)
+      END
+   NEXT I
+*
+   PRINT 'Part 1 ANS: ' : SUM
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+200:NULL
+*
+   NUMBER.OF.LINES = DCOUNT(RAW.DATA,@AM)
+*
+   DIM COPIES(250)
+   MAT COPIES = 1
+*
+   FOR I = 1 TO NUMBER.OF.LINES
+      LINE = RAW.DATA<I>
+*
+      NUMBERS = TRIM(FIELD(FIELD(LINE,'|',1),':',2))
+      CONVERT ' ' TO @AM IN NUMBERS
+*
+      GUESSES = TRIM(FIELD(LINE,'|',2))
+      CONVERT ' ' TO @AM IN GUESSES
+*
+      NUMBER.OF.GUESSES = DCOUNT(GUESSES,@AM)
+*
+      WINS = 0
+*
+      FOR J = 1 TO NUMBER.OF.GUESSES
+         GUESS = GUESSES<J>
+         LOCATE(GUESS,NUMBERS;ANYPOS) THEN
+            WINS = WINS + 1
+         END
+      NEXT J
+*
+      FOR WIN.CTR = 1 TO WINS
+         COPIES(I+WIN.CTR) += 1 * COPIES(I)
+      NEXT WIN.CTR
+   NEXT I
+*
+   SUM = 0
+   FOR I = 1 TO NUMBER.OF.LINES
+      SUM += COPIES(I)
+   NEXT I
+*
+   PRINT 'Part 2 ANS: ' : SUM
+*
+   RETURN
+*
+* END OF PROGRAM
+*
+   END
+*
