@@ -1,0 +1,65 @@
+*
+   GIT.FILENAME = 'AOC.TEMPLATE'
+   GIT.REPO = 'https://github.com/Krowemoh/AOC-2023.git'
+*
+   EQU TRUE TO 1
+   EQU FALSE TO 0
+*
+   YEAR = 2023
+   DAY = 4
+*
+   AOC.ID = YEAR : '*' : DAY
+*
+   OPEN '','AOC-PUZZLE-FILE' TO AOC.PUZZLE.FILE ELSE
+      PRINT 'Unable to open file: AOC-PUZZLE-FILE - Press RETURN':
+      INPUT ANYTHING
+      STOP
+   END
+*
+   READ RAW.DATA FROM AOC.PUZZLE.FILE,AOC.ID ELSE
+      PRINT 'No Puzzle Input.'
+      STOP
+   END
+*
+   GOSUB TEST.DATA
+*
+   GOSUB 100
+*
+   GOSUB 200
+*
+   STOP
+*
+*********************  S U B R O U T I N E  *********************
+*
+TEST.DATA:NULL
+*
+   RAW.DATA = ''
+*
+   RAW.DATA<-1> = ''
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+100:NULL
+*
+   ANS = ''
+*
+   PRINT 'Part 1 ANS: ' : ANS
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+200:NULL
+*
+   ANS = ''
+*
+   PRINT 'Part 2 ANS: ' : ANS
+*
+   RETURN
+*
+* END OF PROGRAM
+*
+   END
+*
