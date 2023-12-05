@@ -1,0 +1,215 @@
+*
+   GIT.FILENAME = 'AOC.PUZZLE.5'
+   GIT.REPO = 'https://github.com/Krowemoh/AOC-2023.git'
+*
+   EQU TRUE TO 1
+   EQU FALSE TO 0
+*
+   YEAR = 2023
+   DAY = 5
+*
+   AOC.ID = YEAR : '*' : DAY
+*
+   OPEN '','CONTROL-FILE' TO CONTROL.FILE ELSE
+      PRINT 'Unable to open file: CONTROL-FILE - Press RETURN':
+      INPUT ANYTHING
+      STOP
+   END
+*
+   OPEN '','AOC-PUZZLE-FILE' TO AOC.PUZZLE.FILE ELSE
+      PRINT 'Unable to open file: AOC-PUZZLE-FILE - Press RETURN':
+      INPUT ANYTHING
+      STOP
+   END
+*
+   READ RAW.DATA FROM AOC.PUZZLE.FILE,AOC.ID ELSE
+      PRINT 'No Puzzle Input.'
+      STOP
+   END
+*
+   GOSUB TEST.DATA
+*
+   GOSUB PARSE.DATA
+*
+   T1 = TIME()
+*
+   GOSUB 100
+   PART1.ANS = ANS
+*
+   GOSUB 200
+   PART2.ANS = ANS
+*
+   T2 = TIME()
+*
+   PRINT
+   PRINT 'Part 1 ANS: ' : PART1.ANS
+   PRINT 'Part 2 ANS: ' : PART2.ANS
+   PRINT
+   PRINT 'Took: ' : T2 - T1 : 's'
+*
+   RECORD = ''
+   RECORD<1> = PART1.ANS
+   RECORD<2> = PART2.ANS
+   RECORD<3> = T2 - T1
+*
+   WRITE RECORD ON CONTROL.FILE,'NIVETHAN'
+*
+   STOP
+*
+*********************  S U B R O U T I N E  *********************
+*
+TEST.DATA:NULL
+*
+   RAW.DATA = ''
+*
+   RAW.DATA<-1> = 'seeds: 79 14 55 13'
+   RAW.DATA<-1> = ' '
+   RAW.DATA<-1> = 'seed-to-soil map:'
+   RAW.DATA<-1> = '50 98 2'
+   RAW.DATA<-1> = '52 50 48'
+   RAW.DATA<-1> = ' '
+   RAW.DATA<-1> = 'soil-to-fertilizer map:'
+   RAW.DATA<-1> = '0 15 37'
+   RAW.DATA<-1> = '37 52 2'
+   RAW.DATA<-1> = '39 0 15'
+   RAW.DATA<-1> = ' '
+   RAW.DATA<-1> = 'fertilizer-to-water map:'
+   RAW.DATA<-1> = '49 53 8'
+   RAW.DATA<-1> = '0 11 42'
+   RAW.DATA<-1> = '42 0 7'
+   RAW.DATA<-1> = '57 7 4'
+   RAW.DATA<-1> = ' '
+   RAW.DATA<-1> = 'water-to-light map:'
+   RAW.DATA<-1> = '88 18 7'
+   RAW.DATA<-1> = '18 25 70'
+   RAW.DATA<-1> = ' '
+   RAW.DATA<-1> = 'light-to-temperature map:'
+   RAW.DATA<-1> = '45 77 23'
+   RAW.DATA<-1> = '81 45 19'
+   RAW.DATA<-1> = '68 64 13'
+   RAW.DATA<-1> = ' '
+   RAW.DATA<-1> = 'temperature-to-humidity map:'
+   RAW.DATA<-1> = '0 69 1'
+   RAW.DATA<-1> = '1 0 69'
+   RAW.DATA<-1> = ' '
+   RAW.DATA<-1> = 'humidity-to-location map:'
+   RAW.DATA<-1> = '60 56 37'
+   RAW.DATA<-1> = '56 93 4'
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+PARSE.DATA:NULL
+*
+   NUMBER.OF.LINES = DCOUNT(RAW.DATA,@AM)
+*
+   SEEDS = ''
+   MAPS = ''
+*
+   CTR = 0
+*
+   FOR I = 1 TO NUMBER.OF.LINES
+      LINE = TRIM(RAW.DATA<I>)
+*
+      IF I = 1 THEN
+         SEEDS = TRIM(FIELD(LINE,':',2))
+         CONVERT ' ' TO @AM IN SEEDS
+         CONTINUE
+      END
+*
+      IF INDEX(LINE,':',1) # 0 THEN
+         CONTINUE
+      END
+*
+      IF LINE = '' THEN
+         CTR = CTR + 1
+      END
+*
+      CONVERT ' ' TO @SVM IN LINE
+      MAPS<CTR,-1> = LINE
+   NEXT I
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+100:NULL
+*
+   ANS = ''
+*
+   NUMBER.OF.SEEDS = DCOUNT(SEEDS,@AM)
+*
+   LOCATION = ''
+*
+   FOR I = 1 TO NUMBER.OF.SEEDS
+      SEED = SEEDS<I>
+*
+      NUMBER.OF.MAPS = DCOUNT(MAPS,@AM)
+*
+      KEY = SEED
+*
+      FOR J = 1 TO NUMBER.OF.MAPS
+         MAP = MAPS<J>
+*
+         NUMBER.OF.SUB.MAPS = DCOUNT(MAP,@VM)
+*
+         FOR K = 1 TO NUMBER.OF.SUB.MAPS
+            SUB.MAP = MAP<1,K>
+*
+            DEST.RANGE.START = SUB.MAP<1,1,1>
+            SOURCE.RANGE.START = SUB.MAP<1,1,2>
+            RANGE = SUB.MAP<1,1,3>
+*
+            IF KEY < SOURCE.RANGE.START OR KEY >= (SOURCE.RANGE.START + RANGE) THEN
+               KEY = KEY
+               CONTINUE
+            END
+*
+            OFFSET = DEST.RANGE.START - SOURCE.RANGE.START
+            KEY = KEY + OFFSET
+            EXIT
+         NEXT K
+*
+      NEXT J
+*
+      LOCATION<-1>= KEY
+   NEXT I
+*
+   ANS = MINIMUM(LOCATION)
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+200:NULL
+*
+   TEMP.SEEDS = SEEDS
+*
+   SEEDS.LEN = DCOUNT(TEMP.SEEDS,@AM)
+*
+   LOCATION2 = ''
+   LOWER.SEED = ''
+*
+   FOR A = 1 TO SEEDS.LEN STEP 2
+      SEED.START = TEMP.SEEDS<A>
+      SEED.RANGE = TEMP.SEEDS<A+1>
+*
+      TOTAL = (SEED.START + SEED.RANGE - 1)
+*
+      FOR B = SEED.START TO TOTAL 
+         SEEDS = B
+         GOSUB 100
+         LOCATION2<-1> = ANS
+         LOCATION2 = MINIMUM(LOCATION2)
+      NEXT B
+   NEXT A
+*
+   ANS = MINIMUM(LOCATION2)
+*
+   RETURN
+*
+* END OF PROGRAM
+*
+   END
+*
