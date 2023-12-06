@@ -1,0 +1,113 @@
+*
+   GIT.FILENAME = 'AOC.PUZZLE.6'
+   GIT.REPO = 'https://github.com/Krowemoh/AOC-2023.git'
+*
+   EQU TRUE TO 1
+   EQU FALSE TO 0
+*
+   YEAR = 2023
+   DAY = 6
+*
+   AOC.ID = YEAR : '*' : DAY
+*
+   OPEN '','AOC-PUZZLE-FILE' TO AOC.PUZZLE.FILE ELSE
+      PRINT 'Unable to open file: AOC-PUZZLE-FILE - Press RETURN':
+      INPUT ANYTHING
+      STOP
+   END
+*
+   READ RAW.DATA FROM AOC.PUZZLE.FILE,AOC.ID ELSE
+      PRINT 'No Puzzle Input.'
+      STOP
+   END
+*
+*TEMP    GOSUB TEST.DATA
+*
+   GOSUB 100
+*
+   GOSUB 200
+*
+   STOP
+*
+*********************  S U B R O U T I N E  *********************
+*
+TEST.DATA:NULL
+*
+   RAW.DATA = ''
+*
+   RAW.DATA<-1> = 'Time:      7  15   30'
+   RAW.DATA<-1> = 'Distance:  9  40  200'
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+100:NULL
+*
+   ANS = ''
+*
+   TIMES = TRIM(FIELD(RAW.DATA<1>,':',2))
+   CONVERT ' ' TO @AM IN TIMES
+*
+   DISTANCES = TRIM(FIELD(RAW.DATA<2>,':',2))
+   CONVERT ' ' TO @AM IN DISTANCES
+*
+   NUMBER.OF.RACES = DCOUNT(TIMES,@AM)
+*
+   MARGIN = 1
+*
+   FOR I = 1 TO NUMBER.OF.RACES
+      TIME = TIMES<I>
+      DIST = DISTANCES<I>
+*
+      LOST = 1
+      FOR T = 1 TO TIME
+         RACE.DIST = T*(TIME-T)
+         IF RACE.DIST > DIST THEN
+            EXIT
+         END ELSE
+            LOST += 1
+         END
+      NEXT T
+*
+      MARGIN = MARGIN * (TIME - (LOST + LOST-1))
+   NEXT I
+*
+   ANS = MARGIN
+   PRINT 'Part 1 ANS: ' : ANS
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+200:NULL
+*
+   ANS = ''
+*
+   TIME = TRIM(FIELD(RAW.DATA<1>,':',2))
+   CONVERT ' ' TO '' IN TIME
+*
+   DISTANCE = TRIM(FIELD(RAW.DATA<2>,':',2))
+   CONVERT ' ' TO '' IN DISTANCE
+*
+   LOST = 1
+*
+   FOR T = 1 TO TIME
+      RACE.DIST = T*(TIME-T)
+      IF RACE.DIST > DISTANCE THEN
+         EXIT
+      END ELSE
+         LOST += 1
+      END
+   NEXT T
+*
+   ANS = (TIME - (LOST + LOST-1))
+*
+   PRINT 'Part 2 ANS: ' : ANS
+*
+   RETURN
+*
+* END OF PROGRAM
+*
+   END
+*
