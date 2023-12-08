@@ -1,0 +1,243 @@
+*
+   GIT.FILENAME = 'AOC.PUZZLE.8'
+   GIT.REPO = 'https://github.com/Krowemoh/AOC-2023.git'
+*
+   EQU TRUE TO 1
+   EQU FALSE TO 0
+*
+   YEAR = 2023
+   DAY = 8
+*
+   AOC.ID = YEAR : '*' : DAY
+*
+   OPEN '','AOC-PUZZLE-FILE' TO AOC.PUZZLE.FILE ELSE
+      PRINT 'Unable to open file: AOC-PUZZLE-FILE - Press RETURN':
+      INPUT ANYTHING
+      STOP
+   END
+*
+   READ RAW.DATA FROM AOC.PUZZLE.FILE,AOC.ID ELSE
+      PRINT 'No Puzzle Input.'
+      STOP
+   END
+*
+*TEMP    GOSUB TEST.DATA
+*
+*TEMP    GOSUB 100
+*
+   GOSUB 200
+*
+   STOP
+*
+*********************  S U B R O U T I N E  *********************
+*
+TEST.DATA:NULL
+*
+   RAW.DATA = ''
+*
+* P1 Test Case 1
+*
+   RAW.DATA<-1> = 'RL'
+   RAW.DATA<-1> = ' '
+   RAW.DATA<-1> = 'AAA = (BBB, CCC)'
+   RAW.DATA<-1> = 'BBB = (DDD, EEE)'
+   RAW.DATA<-1> = 'CCC = (ZZZ, GGG)'
+   RAW.DATA<-1> = 'DDD = (DDD, DDD)'
+   RAW.DATA<-1> = 'EEE = (EEE, EEE)'
+   RAW.DATA<-1> = 'GGG = (GGG, GGG)'
+   RAW.DATA<-1> = 'ZZZ = (ZZZ, ZZZ)'
+*
+* P1 Test Case 2
+*
+   RAW.DATA = ''
+   RAW.DATA<-1> = 'LLR'
+   RAW.DATA<-1> = ' '
+   RAW.DATA<-1> = 'AAA = (BBB, BBB)'
+   RAW.DATA<-1> = 'BBB = (AAA, ZZZ)'
+   RAW.DATA<-1> = 'ZZZ = (ZZZ, ZZZ)'
+*
+* P2
+*
+   RAW.DATA = ''
+   RAW.DATA<-1> = 'LR'
+   RAW.DATA<-1> = ' '
+   RAW.DATA<-1> = '11A = (11B, XXX)'
+   RAW.DATA<-1> = '11B = (XXX, 11Z)'
+   RAW.DATA<-1> = '11Z = (11B, XXX)'
+   RAW.DATA<-1> = '22A = (22B, XXX)'
+   RAW.DATA<-1> = '22B = (22C, 22C)'
+   RAW.DATA<-1> = '22C = (22Z, 22Z)'
+   RAW.DATA<-1> = '22Z = (22B, 22B)'
+   RAW.DATA<-1> = 'XXX = (XXX, XXX)'
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+100:NULL
+*
+   ANS = ''
+*
+   NUMBER.OF.NODES = DCOUNT(RAW.DATA, @AM)
+*
+   CONVERT '()' TO '' IN RAW.DATA
+   RAW.DATA = CHANGE(RAW.DATA,', ',@VM)
+*
+   PATH = RAW.DATA<1>
+   CONVERT 'L' TO 1 IN PATH
+   CONVERT 'R' TO 2 IN PATH
+*
+   KEYS = ''
+   NODES = ''
+*
+   FOR I = 3 TO NUMBER.OF.NODES
+      KEY = TRIM(FIELD(RAW.DATA<I>,'=',1))
+      NODE = TRIM(FIELD(RAW.DATA<I>,'=',2))
+*
+      KEYS<-1> = KEY
+      NODES<-1> = NODE
+   NEXT I
+*
+   LOCATE('AAA',KEYS;START.POS) ELSE
+      PRINT 'Unable to find: START.POS'
+      STOP
+   END
+*
+   DONE = FALSE
+   P.CTR = 0
+   NUMBER.OF.DIRECTIONS = LEN(PATH)
+*
+   MOVE.CTR = 0
+   POS = START.POS
+*
+   LOOP
+      MOVE.CTR = MOVE.CTR + 1
+      P.CTR = P.CTR + 1
+*
+      IF P.CTR > NUMBER.OF.DIRECTIONS THEN
+         P.CTR = 1
+      END
+*
+      DIR = PATH[P.CTR,1]
+*
+      NEXT.STOP = NODES<POS,DIR>
+      PRINT NEXT.STOP
+*
+      IF NEXT.STOP = 'ZZZ' THEN
+         EXIT
+      END
+*
+      LOCATE(NEXT.STOP,KEYS;POS) ELSE
+         PRINT 'Unable to find: ' : NEXT.STOP
+         STOP
+      END
+   UNTIL DONE DO REPEAT
+*
+   ANS = MOVE.CTR
+*
+   PRINT 'Part 1 ANS: ' : ANS
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+200:NULL
+*
+   EQU ENV.SIZE TO 5000
+   DIM ENV(ENV.SIZE)
+*
+   MAT ENV = ''
+*
+   ANS = ''
+*
+   NUMBER.OF.NODES = DCOUNT(RAW.DATA, @AM)
+*
+   CONVERT '()' TO '' IN RAW.DATA
+   RAW.DATA = CHANGE(RAW.DATA,', ',@VM)
+*
+   PATH = RAW.DATA<1>
+   CONVERT 'L' TO 1 IN PATH
+   CONVERT 'R' TO 2 IN PATH
+*
+   STARTS = ''
+   NEXT.STOPS = ''
+*
+   KEYS = ''
+*
+   DIM NODES1(1000)
+   MAT NODES1 = ''
+*
+   CTR = 0
+*
+   CYCLES = ''
+   CYCLE.DONE = ''
+*
+   FOR I = 3 TO NUMBER.OF.NODES
+      CTR += 1
+      KEY = TRIM(FIELD(RAW.DATA<I>,'=',1))
+      NODE = TRIM(FIELD(RAW.DATA<I>,'=',2))
+*
+      IF KEY[1] = 'A' THEN
+         CYCLES<-1> = KEY
+         STARTS<-1> = CTR
+      END
+*
+      KEYS<-1> = KEY
+      NODES1(CTR) = NODE
+      CALL MAP.SET(MAT ENV,ENV.SIZE,KEY,CTR)
+   NEXT I
+*
+   P.CTR = 0
+   NUMBER.OF.DIRECTIONS = LEN(PATH)
+*
+   NUMBER.OF.STARTS = DCOUNT(STARTS,@AM)
+*
+   LOOP
+      P.CTR = P.CTR + 1
+*
+      IF P.CTR > NUMBER.OF.DIRECTIONS THEN
+         P.CTR = 1
+      END
+*
+      DIR = PATH[P.CTR,1]
+*
+      FOR I = 1 TO NUMBER.OF.STARTS
+         NEXT.STOPS<I> = NODES1(STARTS<I>)<1,DIR>
+      NEXT I
+*
+      FOR I = 1 TO NUMBER.OF.STARTS
+         IF CYCLE.DONE<I> THEN
+            CONTINUE
+         END
+*
+         IF NEXT.STOPS<I>[1] = 'Z' THEN
+            CYCLE.DONE<I> = 1
+            CONTINUE
+         END
+*
+         CYCLES<I,-1> = NEXT.STOPS<I>
+*
+         CALL MAP.GET(MAT ENV,ENV.SIZE,NEXT.STOPS<I>,POS)
+         STARTS<I> = POS
+      NEXT I
+*
+      IF SUM(CYCLE.DONE) = NUMBER.OF.STARTS THEN
+         EXIT
+      END
+   UNTIL FALSE DO REPEAT
+*
+   FOR I = 1 TO NUMBER.OF.STARTS
+      CYCLE.LEN =  DCOUNT(CYCLES<I>,@VM)
+      PRINT CYCLE.LEN
+   NEXT I
+*
+   ANS = 0
+*
+   PRINT 'Part 2 ANS: ' : ANS
+*
+   RETURN
+*
+* END OF PROGRAM
+*
+   END
+*
