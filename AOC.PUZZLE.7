@@ -1,0 +1,413 @@
+*
+   GIT.FILENAME = 'AOC.PUZZLE.7'
+   GIT.REPO = 'https://github.com/Krowemoh/AOC-2023.git'
+*
+   EQU TRUE TO 1
+   EQU FALSE TO 0
+*
+   YEAR = 2023
+   DAY = 7
+*
+   AOC.ID = YEAR : '*' : DAY
+*
+   OPEN '','AOC-PUZZLE-FILE' TO AOC.PUZZLE.FILE ELSE
+      PRINT 'Unable to open file: AOC-PUZZLE-FILE - Press RETURN':
+      INPUT ANYTHING
+      STOP
+   END
+*
+   READ RAW.DATA FROM AOC.PUZZLE.FILE,AOC.ID ELSE
+      PRINT 'No Puzzle Input.'
+      STOP
+   END
+*
+*TEMP    GOSUB TEST.DATA
+*TEMP    GOSUB 100
+*
+*TEMP    GOSUB TEST.DATA
+   GOSUB 200
+*
+   STOP
+*
+*********************  S U B R O U T I N E  *********************
+*
+TEST.DATA:NULL
+*
+   RAW.DATA = ''
+*
+   RAW.DATA<-1> = '32T3K 765'
+   RAW.DATA<-1> = 'T55J5 684'
+   RAW.DATA<-1> = 'KK677 28'
+   RAW.DATA<-1> = 'KTJJT 220'
+   RAW.DATA<-1> = 'QQQJA 483'
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+100:NULL
+*
+   ANS = ''
+*
+   NUMBER.OF.HANDS = DCOUNT(RAW.DATA,@AM)
+*
+   CONVERT 'A' TO 'Z' IN RAW.DATA
+   CONVERT 'K' TO 'Y' IN RAW.DATA
+   CONVERT 'Q' TO 'X' IN RAW.DATA
+   CONVERT 'J' TO 'W' IN RAW.DATA
+   CONVERT 'T' TO 'V' IN RAW.DATA
+*
+   RANKS = ''
+   BIDS = ''
+*
+   FOR I = 1 TO NUMBER.OF.HANDS
+      HAND = FIELD(RAW.DATA<I>,' ',1)
+      BID = FIELD(RAW.DATA<I>,' ',2)
+*
+      GOSUB GET.POWERS
+*
+      BEGIN CASE
+         CASE POWERS<5> # ''
+            LOCATE(HAND,RANKS,1;H.POS;'DL') ELSE
+               RANKS = INSERT(RANKS,1,H.POS,0,HAND)
+               BIDS = INSERT(BIDS,1,H.POS,0,BID)
+            END
+*
+         CASE POWERS<4> # ''
+            LOCATE(HAND,RANKS,2;H.POS;'DL') ELSE
+               RANKS = INSERT(RANKS,2,H.POS,0,HAND)
+               BIDS = INSERT(BIDS,2,H.POS,0,BID)
+            END
+*
+         CASE POWERS<3> # '' AND POWERS<2> # ''
+            LOCATE(HAND,RANKS,3;H.POS;'DL') ELSE
+               RANKS = INSERT(RANKS,3,H.POS,0,HAND)
+               BIDS = INSERT(BIDS,3,H.POS,0,BID)
+            END
+*
+         CASE POWERS<3> # ''
+            LOCATE(HAND,RANKS,4;H.POS;'DL') ELSE
+               RANKS = INSERT(RANKS,4,H.POS,0,HAND)
+               BIDS = INSERT(BIDS,4,H.POS,0,BID)
+            END
+*
+         CASE POWERS<2> # '' AND DCOUNT(POWERS<2>,@VM) = 2
+            LOCATE(HAND,RANKS,5;H.POS;'DL') ELSE
+               RANKS = INSERT(RANKS,5,H.POS,0,HAND)
+               BIDS = INSERT(BIDS,5,H.POS,0,BID)
+            END
+*
+         CASE POWERS<2> # ''
+            LOCATE(HAND,RANKS,6;H.POS;'DL') ELSE
+               RANKS = INSERT(RANKS,6,H.POS,0,HAND)
+               BIDS = INSERT(BIDS,6,H.POS,0,BID)
+            END
+*
+         CASE POWERS<1> # ''
+            LOCATE(HAND,RANKS,7;H.POS;'DL') ELSE
+               RANKS = INSERT(RANKS,7,H.POS,0,HAND)
+               BIDS = INSERT(BIDS,7,H.POS,0,BID)
+            END
+      END CASE
+   NEXT I
+*
+   NUMBER.OF.HANDS = DCOUNT(RANKS,@AM)
+*
+   CLEAN.RANKS = ''
+   CLEAN.BIDS = ''
+*
+   FOR I = 1 TO NUMBER.OF.HANDS
+      IF RANKS<I> = '' THEN
+         CONTINUE
+      END
+      CLEAN.RANKS<-1> = RANKS<I>
+      CLEAN.BIDS<-1> = BIDS<I>
+   NEXT I
+*
+   RANKS = CLEAN.RANKS
+   BIDS = CLEAN.BIDS
+*
+   CONVERT @AM TO @VM IN RANKS
+   CONVERT @AM TO @VM IN BIDS
+*
+   RAW.RANKS = RANKS
+   CONVERT @VM TO '-' IN RAW.RANKS
+*TEMP    PRINT RAW.RANKS
+*
+   CONVERT 'Z' TO 'A' IN RANKS
+   CONVERT 'Y' TO 'K' IN RANKS
+   CONVERT 'X' TO 'Q' IN RANKS
+   CONVERT 'W' TO 'J' IN RANKS
+   CONVERT 'V' TO 'T' IN RANKS
+*
+   PR.RANKS = RANKS
+   CONVERT @VM TO '-' IN PR.RANKS
+*TEMP    PRINT PR.RANKS
+*
+*
+   SUM = ''
+*
+   CTR = 0
+*
+   NUMBER.OF.HANDS = DCOUNT(RANKS,@VM)
+*
+   FOR I = NUMBER.OF.HANDS TO 1 STEP -1
+      CTR = CTR + 1
+*
+*TEMP       PRINT RANKS<1,I> : ' = ' : BIDS<1,I> : ' * ' :  CTR
+      SUM = SUM + (BIDS<1,I> * CTR)
+   NEXT I
+*
+   ANS = SUM
+*
+   PRINT 'Part 1 ANS: ' : ANS
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+GET.POWERS:NULL
+*
+   SORTED = ''
+   PROCESSED = ''
+*
+   POWERS = ''
+*
+   FOR C.CTR = 1 TO LEN(HAND)
+      C = HAND[C.CTR,1]
+*
+      LOCATE(C,PROCESSED;ANYPOS) THEN
+         CONTINUE
+      END ELSE
+         PROCESSED<-1> = C
+      END
+*
+      X = COUNT(HAND,C)
+*
+      BEGIN CASE
+         CASE X = 1
+            LOCATE(C,POWERS,1;C.POS;'DL') ELSE
+               POWERS = INSERT(POWERS,1,C.POS,0,C)
+            END
+*
+         CASE X = 2
+            LOCATE(C,POWERS,2;C.POS;'DL') ELSE
+               POWERS = INSERT(POWERS,2,C.POS,0,C)
+            END
+*
+         CASE X = 3
+            LOCATE(C,POWERS,3;C.POS;'DL') ELSE
+               POWERS = INSERT(POWERS,3,C.POS,0,C)
+            END
+*
+         CASE X = 4
+            LOCATE(C,POWERS,4;C.POS;'DL') ELSE
+               POWERS = INSERT(POWERS,4,C.POS,0,C)
+            END
+*
+         CASE X = 5
+            LOCATE(C,POWERS,5;C.POS;'DL') ELSE
+               POWERS = INSERT(POWERS,5,C.POS,0,C)
+            END
+      END CASE
+   NEXT C.CTR
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+200:NULL
+*
+   ANS = ''
+*
+   NUMBER.OF.HANDS = DCOUNT(RAW.DATA,@AM)
+*
+   CONVERT 'A' TO 'Z' IN RAW.DATA
+   CONVERT 'K' TO 'Y' IN RAW.DATA
+   CONVERT 'Q' TO 'X' IN RAW.DATA
+   CONVERT 'J' TO '1' IN RAW.DATA
+   CONVERT 'T' TO 'V' IN RAW.DATA
+*
+   RANKS = ''
+   BIDS = ''
+*
+   FOR I = 1 TO NUMBER.OF.HANDS
+      HAND = FIELD(RAW.DATA<I>,' ',1)
+      BID = FIELD(RAW.DATA<I>,' ',2)
+*
+      GOSUB GET.POWERS.P2
+*
+      LOCATE(HAND,RANKS,POWERS;H.POS;'DL') ELSE
+         RANKS = INSERT(RANKS,POWERS,H.POS,0,HAND)
+         BIDS = INSERT(BIDS,POWERS,H.POS,0,BID)
+      END
+   NEXT I
+*
+   NUMBER.OF.HANDS = DCOUNT(RANKS,@AM)
+*
+   CLEAN.RANKS = ''
+   CLEAN.BIDS = ''
+*
+   FOR I = 1 TO NUMBER.OF.HANDS
+      IF RANKS<I> = '' THEN
+         CONTINUE
+      END
+      CLEAN.RANKS<-1> = RANKS<I>
+      CLEAN.BIDS<-1> = BIDS<I>
+   NEXT I
+*
+   RANKS = CLEAN.RANKS
+   BIDS = CLEAN.BIDS
+*
+   CONVERT @AM TO @VM IN RANKS
+   CONVERT @AM TO @VM IN BIDS
+*
+   RAW.RANKS = RANKS
+   CONVERT @VM TO '-' IN RAW.RANKS
+*TEMP    PRINT RAW.RANKS
+*
+   CONVERT 'Z' TO 'A' IN RANKS
+   CONVERT 'Y' TO 'K' IN RANKS
+   CONVERT 'X' TO 'Q' IN RANKS
+   CONVERT '1' TO 'J' IN RANKS
+   CONVERT 'V' TO 'T' IN RANKS
+*
+   PR.RANKS = RANKS
+   CONVERT @VM TO '-' IN PR.RANKS
+*TEMP    PRINT PR.RANKS
+*
+*
+   SUM = ''
+*
+   CTR = 0
+*
+   NUMBER.OF.HANDS = DCOUNT(RANKS,@VM)
+*
+   FOR I = NUMBER.OF.HANDS TO 1 STEP -1
+      CTR = CTR + 1
+*
+*TEMP       PRINT RANKS<1,I> : ' = ' : BIDS<1,I> : ' * ' :  CTR
+      SUM = SUM + (BIDS<1,I> * CTR)
+   NEXT I
+*
+   ANS = SUM
+*
+   PRINT 'Part 2 ANS: ' : ANS
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+GET.POWERS.P2:NULL
+*
+   SORTED = ''
+   PROCESSED = ''
+*
+   POWERS = ''
+*
+   FOR C.CTR = 1 TO LEN(HAND)
+      C = HAND[C.CTR,1]
+*
+      IF C = 1 THEN
+         CONTINUE
+      END
+*
+      LOCATE(C,PROCESSED;ANYPOS) THEN
+         CONTINUE
+      END ELSE
+         PROCESSED<-1> = C
+      END
+*
+      X = COUNT(HAND,C)
+*
+      BEGIN CASE
+         CASE X = 1
+            IF POWERS = '' OR POWERS > 7 THEN POWERS = 7
+*
+         CASE X = 2
+            IF POWERS = 6 THEN
+               POWERS = 5
+            END ELSE IF POWERS = 4 THEN
+               POWERS = 3
+            END ELSE
+               IF POWERS = '' OR POWERS > 6 THEN POWERS = 6
+            END
+*
+         CASE X = 3
+            IF POWERS = 6 THEN
+               POWERS = 3
+            END ELSE
+               IF POWERS = '' OR POWERS > 4 THEN POWERS = 4
+            END
+*
+         CASE X = 4
+            IF POWERS = '' OR POWERS > 2 THEN POWERS = 2
+*
+         CASE X = 5
+            IF POWERS = '' OR POWERS > 1 THEN POWERS = 1
+      END CASE
+   NEXT C.CTR
+*
+   J.COUNT = COUNT(HAND,1)
+*
+   BEGIN CASE
+      CASE J.COUNT = 5
+         POWERS = 1
+*
+      CASE J.COUNT = 4
+         POWERS = 1
+*
+      CASE J.COUNT = 3
+         IF POWERS = 6 THEN
+            POWERS = 1
+         END ELSE
+            POWERS = 2
+         END
+*
+      CASE J.COUNT = 2
+         IF POWERS = 7 THEN
+            POWERS = 4
+         END ELSE IF POWERS = 6 THEN
+            POWERS = 2
+         END ELSE IF POWERS = 4 THEN
+            POWERS = 1
+         END
+*
+      CASE J.COUNT = 1
+         IF POWERS = 7 THEN         
+            POWERS = 6
+         END ELSE IF POWERS = 6 THEN
+            POWERS = 4
+         END ELSE IF POWERS = 5 THEN
+            POWERS = 3
+         END ELSE IF POWERS = 4 THEN
+            POWERS = 2
+         END ELSE IF POWERS = 3 THEN
+            POWERS = 2
+         END ELSE IF POWERS = 2 THEN
+            POWERS = 1
+         END
+*
+   END CASE
+*
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+SORT.HAND:NULL
+*
+   FOR H.CTR = 5 TO 1 STEP -1
+      FOR N.CTR = 1 TO DCOUNT(POWERS<H.CTR>,@VM)
+         SORTED = SORTED : STR(POWERS<H.CTR,N.CTR>,H.CTR)
+      NEXT N.CTR
+   NEXT H.CTR
+*
+   SORTED = HAND
+*
+   RETURN
+*
+* END OF PROGRAM
+*
+   END
+*
