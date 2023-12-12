@@ -1,0 +1,208 @@
+*
+   GIT.FILENAME = 'AOC.PUZZLE.10'
+   GIT.REPO = 'https://github.com/Krowemoh/AOC-2023.git'
+*
+   EQU TRUE TO 1
+   EQU FALSE TO 0
+*
+   YEAR = 2023
+   DAY = 10
+*
+   AOC.ID = YEAR : '*' : DAY
+*
+   OPEN '','AOC-PUZZLE-FILE' TO AOC.PUZZLE.FILE ELSE
+      PRINT 'Unable to open file: AOC-PUZZLE-FILE - Press RETURN':
+      INPUT ANYTHING
+      STOP
+   END
+*
+   READ RAW.DATA FROM AOC.PUZZLE.FILE,AOC.ID ELSE
+      PRINT 'No Puzzle Input.'
+      STOP
+   END
+*
+   GOSUB TEST.DATA
+*
+   GOSUB 100
+*
+   GOSUB 200
+*
+   STOP
+*
+*********************  S U B R O U T I N E  *********************
+*
+TEST.DATA:NULL
+*
+   RAW.DATA = ''
+*
+   RAW.DATA<-1> = '.....'
+   RAW.DATA<-1> = '.S-7.'
+   RAW.DATA<-1> = '.|.|.'
+   RAW.DATA<-1> = '.L-J.'
+   RAW.DATA<-1> = '.....'
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+100:NULL
+*
+   ANS = ''
+*
+   X.POS = ''
+   Y.POS = ''
+*
+   NUMBER.OF.LINES = DCOUNT(RAW.DATA,@AM)
+*
+   START.POS = 0
+*
+   BOARD = RAW.DATA
+   STEP.BOARD = RAW.DATA
+*
+   EQU STACK.SIZE TO 100
+   DIM STACK(STACK.SIZE)
+   MAT STACK = ''
+*
+   FOR Y.POS = 1 TO NUMBER.OF.LINES
+      LINE = RAW.DATA<Y.POS>
+*
+      FOR C.CTR = 1 TO LEN(LINE)
+         STEP.BOARD<Y.POS>[C.CTR,1] = '.'
+*
+         C = LINE[C.CTR,1]
+         IF C = 'S' THEN
+            BOARD<Y.POS>[C.CTR,1] = 'F'
+            X.START.POS = C.CTR
+            Y.START.POS = Y.POS
+         END
+      NEXT C.CTR
+   NEXT Y.POS
+*
+   COMING.FROM = 'E'
+   D = X.START.POS : @VM : Y.START.POS : @VM : 0 : @VM : COMING.FROM
+   CALL STACK.PUSH(MAT STACK,STACK.SIZE,D)
+*
+*TEMP    PRINT BOARD
+*
+   GOSUB NEXT.STEP
+*
+*TEMP    PRINT
+*TEMP    PRINT STEP.BOARD
+*
+   ANS = (STEP + 1) /2
+*
+   PRINT 'Part 1 ANS: ' : ANS
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+NEXT.STEP:NULL
+*
+   LOOP UNTIL FALSE DO
+      IF X.POS = X.START.POS AND Y.POS = Y.START.POS THEN
+         EXIT
+      END
+*
+      CALL STACK.POP(MAT STACK,STACK.SIZE,D)
+*
+      X.POS = D<1,1>
+      Y.POS = D<1,2>
+      STEP = D<1,3>
+      COMING.FROM = D<1,4>
+*
+      PIECE = BOARD<Y.POS>[X.POS,1]
+      STEP.BOARD<Y.POS>[X.POS,1] = STEP
+*
+*TEMP       PRINT
+*TEMP       PRINT STEP.BOARD
+*
+      BEGIN CASE
+         CASE PIECE = 'F'
+            IF COMING.FROM = 'E' THEN COMING.FROM = 'N' ELSE COMING.FROM = 'W'
+            GOSUB SET.DIR
+            X.POS = X.POS + X.DIR
+            Y.POS = Y.POS + Y.DIR
+            D = X.POS : @VM : Y.POS : @VM : STEP + 1 : @VM : COMING.FROM
+            CALL STACK.PUSH(MAT STACK,STACK.SIZE,D)
+*
+         CASE PIECE = '7'
+            IF COMING.FROM = 'W' THEN COMING.FROM = 'N' ELSE COMING.FROM = 'E'
+            GOSUB SET.DIR
+            X.POS = X.POS + X.DIR
+            Y.POS = Y.POS + Y.DIR
+            D = X.POS : @VM : Y.POS : @VM : STEP + 1: @VM : COMING.FROM
+            CALL STACK.PUSH(MAT STACK,STACK.SIZE,D)
+*
+         CASE PIECE = 'L'
+            IF COMING.FROM = 'E' THEN COMING.FROM = 'S' ELSE COMING.FROM = 'W'
+            GOSUB SET.DIR
+            X.POS = X.POS + X.DIR
+            Y.POS = Y.POS + Y.DIR
+            D = X.POS : @VM : Y.POS : @VM : STEP + 1: @VM : COMING.FROM
+            CALL STACK.PUSH(MAT STACK,STACK.SIZE,D)
+*
+         CASE PIECE = 'J'
+            IF COMING.FROM = 'W' THEN COMING.FROM = 'S' ELSE COMING.FROM = 'E'
+            GOSUB SET.DIR
+            X.POS = X.POS + X.DIR
+            Y.POS = Y.POS + Y.DIR
+            D = X.POS : @VM : Y.POS : @VM : STEP + 1: @VM : COMING.FROM
+            CALL STACK.PUSH(MAT STACK,STACK.SIZE,D)
+*
+         CASE PIECE = '-'
+            IF COMING.FROM = 'W' THEN COMING.FROM = 'W' ELSE COMING.FROM = 'E'
+            GOSUB SET.DIR
+            X.POS = X.POS + X.DIR
+            Y.POS = Y.POS + Y.DIR
+            D = X.POS : @VM : Y.POS : @VM : STEP + 1: @VM : COMING.FROM
+            CALL STACK.PUSH(MAT STACK,STACK.SIZE,D)
+*
+         CASE PIECE = '|'
+            IF COMING.FROM = 'N' THEN COMING.FROM = 'N' ELSE COMING.FROM = 'S'
+            GOSUB SET.DIR
+            X.POS = X.POS + X.DIR
+            Y.POS = Y.POS + Y.DIR
+            D = X.POS : @VM : Y.POS : @VM : STEP + 1: @VM : COMING.FROM
+            CALL STACK.PUSH(MAT STACK,STACK.SIZE,D)
+      END CASE
+*
+   REPEAT
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+SET.DIR:NULL
+*
+   BEGIN CASE
+      CASE COMING.FROM = 'N'
+         X.DIR = 0
+         Y.DIR = 1
+      CASE COMING.FROM = 'S'
+         X.DIR = 0
+         Y.DIR = -1
+      CASE COMING.FROM = 'E'
+         X.DIR = -1
+         Y.DIR = 0
+      CASE COMING.FROM = 'W'
+         X.DIR = 1
+         Y.DIR = 0
+   END CASE
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+200:NULL
+*
+   ANS = ''
+*
+   PRINT 'Part 2 ANS: ' : ANS
+*
+   RETURN
+*
+* END OF PROGRAM
+*
+   END
+*
