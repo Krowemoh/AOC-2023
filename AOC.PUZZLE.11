@@ -1,0 +1,231 @@
+*
+   GIT.FILENAME = 'AOC.PUZZLE.11'
+   GIT.REPO = 'https://github.com/Krowemoh/AOC-2023.git'
+*
+   EQU TRUE TO 1
+   EQU FALSE TO 0
+*
+   YEAR = 2023
+   DAY = 11
+*
+   AOC.ID = YEAR : '*' : DAY
+*
+   OPEN '','AOC-PUZZLE-FILE' TO AOC.PUZZLE.FILE ELSE
+      PRINT 'Unable to open file: AOC-PUZZLE-FILE - Press RETURN':
+      INPUT ANYTHING
+      STOP
+   END
+*
+   READ RAW.DATA FROM AOC.PUZZLE.FILE,AOC.ID ELSE
+      PRINT 'No Puzzle Input.'
+      STOP
+   END
+*
+   GOSUB TEST.DATA
+*
+   GOSUB 100
+*
+   GOSUB 200
+*
+   STOP
+*
+*********************  S U B R O U T I N E  *********************
+*
+TEST.DATA:NULL
+*
+   RAW.DATA = ''
+*
+   RAW.DATA<-1> = '...#......'
+   RAW.DATA<-1> = '.......#..'
+   RAW.DATA<-1> = '#.........'
+   RAW.DATA<-1> = '..........'
+   RAW.DATA<-1> = '......#...'
+   RAW.DATA<-1> = '.#........'
+   RAW.DATA<-1> = '.........#'
+   RAW.DATA<-1> = '..........'
+   RAW.DATA<-1> = '.......#..'
+   RAW.DATA<-1> = '#...#.....'
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+100:NULL
+*
+   ANS = ''
+*
+   NUMBER.OF.ROWS = DCOUNT(RAW.DATA,@AM)
+*
+   NEW.U = ''
+*
+   FOR I = 1 TO NUMBER.OF.ROWS
+      LINE = RAW.DATA<I>
+      NEW.U<-1> = LINE
+      IF LINE = STR('.',LEN(LINE)) THEN
+         NEW.U<-1> = LINE
+      END
+   NEXT I
+*
+   NUMBER.OF.ROWS = DCOUNT(NEW.U,@AM)
+   ROW.LEN = LEN(NEW.U<1>)
+*
+   UV = ''
+   CTR = 0
+   CH.CTR = 0
+*
+   FOR C.CTR = 1 TO ROW.LEN
+      CH.CTR = CH.CTR + 1
+      CTR = 0
+*
+      PROCEED = TRUE
+*
+      FOR I = 1 TO NUMBER.OF.ROWS
+         CTR = CTR + 1
+         C = NEW.U<I>[C.CTR,1]
+         UV<CTR,CH.CTR> = C
+         IF C = '#' THEN
+            PROCEED = FALSE
+         END
+      NEXT I
+*
+      IF PROCEED THEN
+         CTR = 0
+         CH.CTR = CH.CTR + 1
+         FOR I = 1 TO NUMBER.OF.ROWS
+            CTR = CTR + 1
+            C = NEW.U<I>[C.CTR,1]
+            UV<CTR,CH.CTR> = C
+         NEXT I
+      END
+   NEXT C.CTR
+*
+*TEMP    PRINT UV
+*TEMP    PRINT
+*
+   POINTS = ''
+*
+   NUMBER.OF.ROWS = DCOUNT(UV,@AM)
+   ROW.LEN = LEN(UV<1>)
+*
+   FOR I = 1 TO NUMBER.OF.ROWS
+      FOR J = 1 TO ROW.LEN
+         IF UV<I,J> = '#' THEN
+            POINTS<-1> = I : @VM : J
+         END
+      NEXT J
+   NEXT I
+*
+   NUMBER.OF.POINTS = DCOUNT(POINTS,@AM)
+*
+   DISTANCES = ''
+*
+   FOR I = 1 TO NUMBER.OF.POINTS
+*TEMP       PRINT I, NUMBER.OF.POINTS
+      FOR J = I TO NUMBER.OF.POINTS
+         Y = ABS(POINTS<I,1> - POINTS<J,1>)
+         X = ABS(POINTS<I,2> - POINTS<J,2>)
+         D = X + Y
+*TEMP          PRINT I, J, POINTS<I>, POINTS<J>, D
+         DISTANCES<-1> = D
+      NEXT J
+*TEMP       PRINT
+   NEXT I
+*
+   ANS = SUM(DISTANCES)
+   PRINT 'Part 1 ANS: ' : ANS
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+200:NULL
+*
+   ANS = ''
+*
+   JUMP.ROWS = ''
+   JUMP.COLS = ''
+   POINTS = ''
+*
+   NUMBER.OF.ROWS = DCOUNT(RAW.DATA,@AM)
+   NUMBER.OF.COLS = LEN(RAW.DATA<1>)
+*
+   INCR = 10 - 1
+*TEMP    INCR = 1000000 - 1
+*
+   FOR Y = 1 TO NUMBER.OF.ROWS
+      LINE = RAW.DATA<Y>
+*
+      FOR X = 1 TO NUMBER.OF.COLS
+         IF RAW.DATA<Y>[X,1] = '#' THEN
+            POINTS<-1> = X : @VM : Y
+         END
+      NEXT X
+*
+      IF STR('.',NUMBER.OF.COLS) = LINE THEN
+         JUMP.ROWS<-1> = Y
+      END
+   NEXT Y
+*
+   FOR X = 1 TO NUMBER.OF.COLS
+      BLANK.COL = TRUE
+      FOR Y = 1 TO NUMBER.OF.ROWS
+         IF RAW.DATA<Y>[X,1] = '#' THEN
+            BLANK.COL = FALSE
+         END
+      NEXT Y
+      IF BLANK.COL THEN
+         JUMP.COLS<-1> = X
+      END
+   NEXT X
+*
+   NUMBER.OF.POINTS = DCOUNT(POINTS,@AM)
+*
+   DISTANCES = ''
+*
+   FOR I = 1 TO NUMBER.OF.POINTS
+      FOR J = I TO NUMBER.OF.POINTS
+         X1 = POINTS<I,1>
+         X2 = POINTS<J,1>
+*
+         FOR K = 1 TO DCOUNT(JUMP.COLS,@AM)
+            IF POINTS<I,1> > JUMP.COLS<K> THEN
+               X1 = X1 + INCR
+            END
+            IF POINTS<J,1> > JUMP.COLS<K> THEN
+               X2 = X2 + INCR
+            END
+         NEXT K
+*
+         Y1 = POINTS<I,2>
+         Y2 = POINTS<J,2>
+*
+         FOR K = 1 TO DCOUNT(JUMP.ROWS,@AM)
+            IF POINTS<I,2> > JUMP.ROWS<K> THEN
+               Y1 = Y1 + INCR
+            END
+            IF POINTS<J,2> > JUMP.ROWS<K> THEN
+               Y2 = Y2 + INCR
+            END
+         NEXT K
+*
+         X = ABS(X1-X2)
+         Y = ABS(Y1-Y2)
+*
+         D = X + Y
+*
+*TEMP          PRINT I, J, X1, Y1, X2, Y2, D
+         DISTANCES<-1> = D
+      NEXT J
+*TEMP       PRINT
+   NEXT I
+*
+   ANS = SUM(DISTANCES)
+*
+   PRINT 'Part 2 ANS: ' : ANS
+*
+   RETURN
+*
+* END OF PROGRAM
+*
+   END
+*
