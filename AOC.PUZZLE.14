@@ -1,0 +1,254 @@
+*
+   GIT.FILENAME = 'AOC.PUZZLE.14'
+   GIT.REPO = 'https://github.com/Krowemoh/AOC-2023.git'
+*
+   EQU TRUE TO 1
+   EQU FALSE TO 0
+*
+   YEAR = 2023
+   DAY = 14
+*
+   AOC.ID = YEAR : '*' : DAY
+*
+   OPEN '','AOC-PUZZLE-FILE' TO AOC.PUZZLE.FILE ELSE
+      PRINT 'Unable to open file: AOC-PUZZLE-FILE - Press RETURN':
+      INPUT ANYTHING
+      STOP
+   END
+*
+   READ RAW.DATA FROM AOC.PUZZLE.FILE,AOC.ID ELSE
+      PRINT 'No Puzzle Input.'
+      STOP
+   END
+*
+*TEMP    GOSUB TEST.DATA
+*
+*TEMP    GOSUB 100
+*
+   GOSUB 200
+*
+   STOP
+*
+*********************  S U B R O U T I N E  *********************
+*
+TEST.DATA:NULL
+*
+   RAW.DATA = ''
+*
+   RAW.DATA<-1> = 'O....#....'
+   RAW.DATA<-1> = 'O.OO#....#'
+   RAW.DATA<-1> = '.....##...'
+   RAW.DATA<-1> = 'OO.#O....O'
+   RAW.DATA<-1> = '.O.....O#.'
+   RAW.DATA<-1> = 'O.#..O.#.#'
+   RAW.DATA<-1> = '..O..#O..O'
+   RAW.DATA<-1> = '.......O..'
+   RAW.DATA<-1> = '#....###..'
+   RAW.DATA<-1> = '#OO..#....'
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+100:NULL
+*
+   NUMBER.OF.LINES = DCOUNT(RAW.DATA,@AM)
+   LINE.LEN = LEN(RAW.DATA<1>)
+*
+   FOR E.CTR = 1 TO NUMBER.OF.LINES
+      IF E.CTR = 1 THEN CONTINUE
+      GOSUB MOVE.NORTH
+   NEXT I
+*
+   X = COUNTS(RAW.DATA,'O')
+*
+   CTR = DCOUNT(X,@AM)
+*
+   SUM = 0
+   FOR I = 1 TO DCOUNT(X,@AM)
+      SUM = SUM + X<I> * CTR
+      CTR = CTR - 1
+   NEXT I
+*
+   ANS = SUM
+*
+   PRINT 'Part 1 ANS: ' : ANS
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+MOVE.NORTH:NULL
+*
+   FOR J = E.CTR TO 2 STEP -1
+      LINE = RAW.DATA<J>
+      PREV.LINE = RAW.DATA<J-1>
+*
+      FOR C.CTR = 1 TO LEN(LINE)
+         IF LINE[C.CTR,1] # 'O' THEN CONTINUE
+         IF PREV.LINE[C.CTR,1] = '#' THEN CONTINUE
+         IF PREV.LINE[C.CTR,1] = 'O' THEN CONTINUE
+         PREV.LINE[C.CTR,1] = LINE[C.CTR,1]
+         LINE[C.CTR,1] = '.'
+      NEXT C.CTR
+*
+      RAW.DATA<J> = LINE
+      RAW.DATA<J-1> = PREV.LINE
+   NEXT J
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+MOVE.WEST:NULL
+*
+   FOR J = E.CTR TO 2 STEP -1
+      FOR ROW.CTR = 1 TO NUMBER.OF.LINES
+         IF RAW.DATA<ROW.CTR>[J,1] # 'O' THEN CONTINUE
+         IF RAW.DATA<ROW.CTR>[J-1,1] = '#' THEN CONTINUE
+         IF RAW.DATA<ROW.CTR>[J-1,1] = 'O' THEN CONTINUE
+         RAW.DATA<ROW.CTR>[J-1,1] = RAW.DATA<ROW.CTR>[J,1]
+         RAW.DATA<ROW.CTR>[J,1] = '.'
+      NEXT C.CTR
+   NEXT J
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+MOVE.SOUTH:NULL
+*
+   FOR J = E.CTR TO NUMBER.OF.LINES-1
+      LINE = RAW.DATA<J>
+      NEXT.LINE = RAW.DATA<J+1>
+*
+      FOR C.CTR = 1 TO LEN(LINE)
+         IF LINE[C.CTR,1] # 'O' THEN CONTINUE
+         IF NEXT.LINE[C.CTR,1] = '#' THEN CONTINUE
+         IF NEXT.LINE[C.CTR,1] = 'O' THEN CONTINUE
+         NEXT.LINE[C.CTR,1] = LINE[C.CTR,1]
+         LINE[C.CTR,1] = '.'
+      NEXT C.CTR
+*
+      RAW.DATA<J> = LINE
+      RAW.DATA<J+1> = NEXT.LINE
+   NEXT J
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+MOVE.EAST:NULL
+*
+   FOR J = E.CTR TO LINE.LEN-1
+      FOR ROW.CTR = 1 TO NUMBER.OF.LINES
+         IF RAW.DATA<ROW.CTR>[J,1] # 'O' THEN CONTINUE
+         IF RAW.DATA<ROW.CTR>[J+1,1] = '#' THEN CONTINUE
+         IF RAW.DATA<ROW.CTR>[J+1,1] = 'O' THEN CONTINUE
+         RAW.DATA<ROW.CTR>[J+1,1] = RAW.DATA<ROW.CTR>[J,1]
+         RAW.DATA<ROW.CTR>[J,1] = '.'
+      NEXT C.CTR
+   NEXT J
+*
+   RETURN
+*********************  S U B R O U T I N E  *********************
+*
+200:NULL
+*
+   ANS = ''
+*
+*
+   NUMBER.OF.LINES = DCOUNT(RAW.DATA,@AM)
+   LINE.LEN = LEN(RAW.DATA<1>)
+*
+   N = '1_000_000_000'
+   CONVERT '_' TO '' IN N
+*
+   CYCLE.DATA = ''
+   CYCLE.LEN = ''
+*
+   FOR CYCLE.CTR = 1 TO N
+      PRINT CYCLE.CTR :'-': N
+*
+      FOR E.CTR = 1 TO NUMBER.OF.LINES
+         IF E.CTR = 1 THEN CONTINUE
+         GOSUB MOVE.NORTH
+      NEXT I
+*
+      FOR E.CTR = 1 TO LINE.LEN
+         IF E.CTR = 1 THEN CONTINUE
+         GOSUB MOVE.WEST
+      NEXT I
+*
+      FOR E.CTR = NUMBER.OF.LINES TO 1 STEP -1
+         IF E.CTR = NUMBER.OF.LINES THEN CONTINUE
+         GOSUB MOVE.SOUTH
+      NEXT I
+*
+      FOR E.CTR = LINE.LEN TO 1 STEP -1
+         IF E.CTR = LINE.LEN THEN CONTINUE
+         GOSUB MOVE.EAST
+      NEXT I
+*
+      S.DATA = RAW.DATA
+      CONVERT @AM TO '_' IN S.DATA
+*
+      LOCATE(S.DATA,CYCLE.DATA;ANYPOS) THEN
+         IF CYCLE.LEN = '' THEN
+            ALL.CYCLES = DCOUNT(CYCLE.DATA,@AM) + 1
+            CYCLE.LEN = ALL.CYCLES - ANYPOS 
+            SKIP.CYCLES = ANYPOS
+         END
+*
+         PRINT 'All: ' : ALL.CYCLES
+         PRINT 'Cycle Length: ' : CYCLE.LEN
+         PRINT 'Skip Cycles: ' : SKIP.CYCLES
+*
+         M = MOD(CYCLE.CTR-SKIP.CYCLES,CYCLE.LEN) + SKIP.CYCLES
+*
+         PRINT 'Match Found: ' : ANYPOS, CYCLE.CTR, M
+*
+         M = MOD(N-SKIP.CYCLES,CYCLE.LEN) + SKIP.CYCLES
+*
+         S.DATA = CYCLE.DATA<M>
+         CONVERT '_' TO @AM IN S.DATA
+         TEMP.DATA = S.DATA
+*
+         GOSUB CALCULATE
+*
+         PRINT 'Total: ' : SUM
+         EXIT
+      END ELSE
+         CYCLE.DATA<-1> = S.DATA
+      END
+*
+   NEXT CYCLE.CTR
+*
+   TEMP.DATA = S.DATA
+   GOSUB CALCULATE
+   ANS = SUM
+*
+*
+   PRINT 'Part 2 ANS: ' : ANS
+*
+   RETURN
+*********************  S U B R O U T I N E  *********************
+*
+CALCULATE:NULL
+*
+   X = COUNTS(TEMP.DATA,'O')
+*
+   CTR = DCOUNT(X,@AM)
+*
+   SUM = 0
+   FOR I = 1 TO DCOUNT(X,@AM)
+      SUM = SUM + X<I> * CTR
+      CTR = CTR - 1
+   NEXT I
+*
+   RETURN
+*
+* END OF PROGRAM
+*
+   END
+*
