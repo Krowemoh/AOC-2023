@@ -1,0 +1,139 @@
+*
+   GIT.FILENAME = 'AOC.PUZZLE.15'
+   GIT.REPO = 'https://github.com/Krowemoh/AOC-2023.git'
+*
+   EQU TRUE TO 1
+   EQU FALSE TO 0
+*
+   YEAR = 2023
+   DAY = FIELD(GIT.FILENAME,'.',3)
+*
+   AOC.ID = YEAR : '*' : DAY
+*
+   OPEN '','AOC-PUZZLE-FILE' TO AOC.PUZZLE.FILE ELSE
+      PRINT 'Unable to open file: AOC-PUZZLE-FILE - Press RETURN':
+      INPUT ANYTHING
+      STOP
+   END
+*
+   READ RAW.DATA FROM AOC.PUZZLE.FILE,AOC.ID ELSE
+      PRINT 'No Puzzle Input.'
+      STOP
+   END
+*
+*TEMP    GOSUB TEST.DATA
+*
+*TEMP    GOSUB 100
+*
+   GOSUB 200
+*
+   STOP
+*
+*********************  S U B R O U T I N E  *********************
+*
+TEST.DATA:NULL
+*
+   RAW.DATA = 'rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7'
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+100:NULL
+*
+   ANS = ''
+*
+   CONVERT ',' TO @AM IN RAW.DATA
+   NUMBER.OF.STEPS = DCOUNT(RAW.DATA,@AM)
+*
+   SUM = 0
+*
+   FOR I = 1 TO NUMBER.OF.STEPS
+      STR = RAW.DATA<I>
+      GOSUB HASH
+      SUM = SUM + CV
+      PRINT STR, CV
+   NEXT I
+*
+   ANS = SUM
+   PRINT 'Part 1 ANS: ' : ANS
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+HASH:NULL
+*
+   CV = 0
+   FOR C.CTR = 1 TO LEN(STR)
+      C = STR[C.CTR,1]
+      IF C = ',' THEN CONTINUE
+      CV = CV + SEQ(C)
+      CV = CV * 17
+      CV = MOD(CV,256)
+   NEXT C.CTR
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+200:NULL
+*
+   ANS = ''
+*
+   CONVERT ',' TO @AM IN RAW.DATA
+   NUMBER.OF.STEPS = DCOUNT(RAW.DATA,@AM)
+*
+   BOX = ''
+*
+   FOR I = 1 TO NUMBER.OF.STEPS
+      LINE = RAW.DATA<I>
+*
+      IF INDEX(LINE,'=',1) # 0 THEN
+         LABEL = FIELD(LINE,'=',1)
+         FOCAL.LENGTH = FIELD(LINE,'=',2)
+*
+         STR = LABEL
+         GOSUB HASH
+*
+         CV = CV + 1
+*
+         LOCATE(LABEL,BOX,CV,1;ANYPOS) THEN
+            BOX<CV,1,ANYPOS> = LABEL
+            BOX<CV,2,ANYPOS> = FOCAL.LENGTH
+         END ELSE
+            BOX<CV,1,-1> = LABEL
+            BOX<CV,2,-1> = FOCAL.LENGTH
+         END
+*
+      END ELSE IF INDEX(LINE,'-',1) # 0 THEN
+         LABEL = FIELD(LINE,'-',1)
+*
+         STR = LABEL
+         GOSUB HASH
+         CV = CV + 1
+*
+         LOCATE(LABEL,BOX,CV,1;ANYPOS) THEN
+            BOX = DELETE(BOX,CV,1,ANYPOS)
+            BOX = DELETE(BOX,CV,2,ANYPOS)
+         END
+      END
+   NEXT I
+*
+   SUM = 0
+*
+   FOR I = 1 TO DCOUNT(BOX,@AM)
+      FOR J = 1 TO DCOUNT(BOX<I,1>,@SVM)
+         SUM += I * J * BOX<I,2,J>
+      NEXT J
+   NEXT I
+*
+   ANS = SUM
+*
+   PRINT 'Part 2 ANS: ' : ANS
+*
+   RETURN
+*
+* END OF PROGRAM
+*
+   END
+*
