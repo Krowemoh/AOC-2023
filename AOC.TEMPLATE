@@ -6,7 +6,7 @@
    EQU FALSE TO 0
 *
    YEAR = 2023
-   DAY = 4
+   DAY = FIELD(GIT.FILENAME,'.',3)
 *
    AOC.ID = YEAR : '*' : DAY
 *
