@@ -21,7 +21,7 @@
       STOP
    END
 *
-   GOSUB TEST.DATA
+*TEMP    GOSUB TEST.DATA
 *
    GOSUB 100
 *
@@ -79,7 +79,7 @@ TEST.DATA:NULL
 *
    LOOP
       CTR = CTR + 1
-   UNTIL CTR > 150 DO
+   UNTIL CTR > 50050 DO
 *
       CALL STACK.POP(MAT STACK,STACK.SIZE,STEP)
 *
@@ -91,23 +91,27 @@ TEST.DATA:NULL
 *
       DIR = STEP<1,3>
 *
+      B = BOARD<Y.POS>[X.POS,1]
+*
       BOARD<Y.POS>[X.POS,1] = 1
 *
       C = RAW.DATA<Y.POS>[X.POS,1]
 *
-*TEMP       IF C = '>' OR C ='<' THEN
-*TEMP          C = '.'
-*TEMP       END
+      IF C = '^' OR C = 'v' OR C = '>' OR C ='<' THEN
+         C = '.'
+      END
 *
       IF C = '|' THEN
          IF DIR = '^' OR DIR = 'v' THEN
             C = '.'
          END ELSE
-            POS = X.POS : @VM : Y.POS - 1 : @VM : '^'
-            CALL STACK.PUSH(MAT STACK,STACK.SIZE,POS)
+            IF NOT(NUM(B)) THEN
+               POS = X.POS : @VM : Y.POS - 1 : @VM : '^'
+               CALL STACK.PUSH(MAT STACK,STACK.SIZE,POS)
 *
-            POS = X.POS : @VM : Y.POS + 1 : @VM : 'v'
-            CALL STACK.PUSH(MAT STACK,STACK.SIZE,POS)
+               POS = X.POS : @VM : Y.POS + 1 : @VM : 'v'
+               CALL STACK.PUSH(MAT STACK,STACK.SIZE,POS)
+            END
          END
       END
 *
@@ -115,11 +119,13 @@ TEST.DATA:NULL
          IF DIR = '<' OR DIR = '>' THEN
             C = '.'
          END ELSE
-            POS = X.POS + 1 : @VM : Y.POS : @VM : '>'
-            CALL STACK.PUSH(MAT STACK,STACK.SIZE,POS)
+            IF NOT(NUM(B)) THEN
+               POS = X.POS + 1 : @VM : Y.POS : @VM : '>'
+               CALL STACK.PUSH(MAT STACK,STACK.SIZE,POS)
 *
-            POS = X.POS - 1 : @VM : Y.POS : @VM : '<'
-            CALL STACK.PUSH(MAT STACK,STACK.SIZE,POS)
+               POS = X.POS - 1 : @VM : Y.POS : @VM : '<'
+               CALL STACK.PUSH(MAT STACK,STACK.SIZE,POS)
+            END
          END
       END
 *
