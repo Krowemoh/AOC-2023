@@ -1,0 +1,208 @@
+*
+   GIT.FILENAME = 'AOC.PUZZLE.19'
+   GIT.REPO = 'https://github.com/Krowemoh/AOC-2023.git'
+*
+   EQU TRUE TO 1
+   EQU FALSE TO 0
+*
+   YEAR = 2023
+   DAY = FIELD(GIT.FILENAME,'.',3)
+*
+   AOC.ID = YEAR : '*' : DAY
+*
+   OPEN '','AOC-PUZZLE-FILE' TO AOC.PUZZLE.FILE ELSE
+      PRINT 'Unable to open file: AOC-PUZZLE-FILE - Press RETURN':
+      INPUT ANYTHING
+      STOP
+   END
+*
+   READ RAW.DATA FROM AOC.PUZZLE.FILE,AOC.ID ELSE
+      PRINT 'No Puzzle Input.'
+      STOP
+   END
+*
+*TEMP    GOSUB TEST.DATA
+*
+   GOSUB 100
+*
+   GOSUB 200
+*
+   STOP
+*
+*********************  S U B R O U T I N E  *********************
+*
+TEST.DATA:NULL
+*
+   RAW.DATA = ''
+*
+   RAW.DATA<-1> = 'px{a<2006:qkq,m>2090:A,rfg}'
+   RAW.DATA<-1> = 'pv{a>1716:R,A}'
+   RAW.DATA<-1> = 'lnx{m>1548:A,A}'
+   RAW.DATA<-1> = 'rfg{s<537:gd,x>2440:R,A}'
+   RAW.DATA<-1> = 'qs{s>3448:A,lnx}'
+   RAW.DATA<-1> = 'qkq{x<1416:A,crn}'
+   RAW.DATA<-1> = 'crn{x>2662:A,R}'
+   RAW.DATA<-1> = 'in{s<1351:px,qqz}'
+   RAW.DATA<-1> = 'qqz{s>2770:qs,m<1801:hdj,R}'
+   RAW.DATA<-1> = 'gd{a>3333:R,R}'
+   RAW.DATA<-1> = 'hdj{m>838:A,pv}'
+   RAW.DATA<-1> = ' '
+   RAW.DATA<-1> = '{x=787,m=2655,a=1222,s=2876}'
+   RAW.DATA<-1> = '{x=1679,m=44,a=2067,s=496}'
+   RAW.DATA<-1> = '{x=2036,m=264,a=79,s=2244}'
+   RAW.DATA<-1> = '{x=2461,m=1339,a=466,s=291}'
+   RAW.DATA<-1> = '{x=2127,m=1623,a=2188,s=1013}'
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+100:NULL
+*
+   ANS = ''
+*
+   RAW.RULES = ''
+   RULES = ''
+   PARTS = ''
+*
+   NUMBER.OF.LINES = DCOUNT(RAW.DATA,@AM)
+*
+   LINES = ''
+*
+   FOR I = 1 TO NUMBER.OF.LINES
+      LINE = TRIM(RAW.DATA<I>)
+      IF LINE = '' THEN
+         RAW.RULES = LINES
+         LINES = ''
+      END ELSE
+         LINES<-1> = LINE
+      END
+   NEXT I
+*
+   PARTS = LINES
+*
+   NUMBER.OF.RULES = DCOUNT(RAW.RULES,@AM)
+*
+   FOR I = 1 TO NUMBER.OF.RULES
+      R = RAW.RULES<I>
+      CONVERT '{}' TO @AM:'' IN R
+      RULES<1,-1> = R<1>
+      CONVERT ',' TO @SVM IN R<2>
+      RULES<2,-1> = R<2>
+   NEXT I
+*
+   NUMBER.OF.PARTS = DCOUNT(PARTS,@AM)
+*
+   ACCEPTED = ''
+*
+   FOR I = 1 TO NUMBER.OF.PARTS
+      PART = PARTS<I>
+      CONVERT '{}' TO '' IN PART
+      CONVERT ',' TO @AM IN PART
+      CONVERT '=' TO @VM IN PART
+*
+      S = 'in'
+      DONE = FALSE
+*
+      LOOP UNTIL DONE DO
+         LOCATE(S,RULES,1;RULE.POS) ELSE STOP
+*
+         R = RULES<2,RULE.POS>
+         NUMBER.OF.TESTS = DCOUNT(R,@SVM)
+*
+         FOR J = 1 TO NUMBER.OF.TESTS
+            TEST = R<1,1,J>
+            IF TEST = 'R' THEN
+               DONE = TRUE
+               EXIT
+            END ELSE IF TEST = 'A' THEN
+               ACCEPTED<-1> = PART
+               DONE = TRUE
+               EXIT
+            END ELSE IF INDEX(TEST,':',1) = 0 THEN
+               S = TEST
+               EXIT
+            END
+*
+            T = FIELD(TEST,':',1)
+            RESULT = FIELD(TEST,':',2)
+*
+            LH = T[1,1]
+            OP = T[2,1]
+            RH = T[3,999]
+*
+            NUMBER.OF.COMPONENTS = DCOUNT(PART,@AM)
+*
+            FOR K = 1 TO NUMBER.OF.COMPONENTS
+               COMPONENT = PART<K,1>
+               IF COMPONENT = LH THEN
+                  LH = PART<K,2>
+                  EXIT
+               END
+            NEXT K
+*
+            BEGIN CASE
+               CASE OP = '<'
+                  IF LH < RH THEN
+                     IF RESULT = 'R' THEN
+                        DONE = TRUE
+                        EXIT
+                     END ELSE IF RESULT = 'A' THEN
+                        ACCEPTED<-1> = PART
+                        DONE = TRUE
+                        EXIT
+                     END ELSE
+                        S = RESULT
+                        EXIT
+                     END
+                  END
+               CASE OP = '>'
+                  IF LH > RH THEN
+                     IF RESULT = 'R' THEN
+                        DONE = TRUE
+                        EXIT
+                     END ELSE IF RESULT = 'A' THEN
+                        ACCEPTED<-1> = PART
+                        DONE = TRUE
+                        EXIT
+                     END ELSE
+                        S = RESULT
+                        EXIT
+                     END
+                  END
+            END CASE
+*
+         NEXT J
+      REPEAT
+*
+   NEXT I
+*
+   NUMBER.OF.ACCEPTED = DCOUNT(ACCEPTED,@AM)
+*
+   SUM = 0
+*
+   FOR I = 1 TO NUMBER.OF.ACCEPTED
+      RATING = ACCEPTED<I,2>
+      SUM += RATING
+   NEXT I
+*
+   ANS = SUM
+*
+   PRINT 'Part 1 ANS: ' : ANS
+*
+   RETURN
+*
+*********************  S U B R O U T I N E  *********************
+*
+200:NULL
+*
+   ANS = ''
+*
+   PRINT 'Part 2 ANS: ' : ANS
+*
+   RETURN
+*
+* END OF PROGRAM
+*
+   END
+*
